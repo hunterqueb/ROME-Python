@@ -1,4 +1,5 @@
 from NatNetClient import NatNetClient
+import math
 
 # we need to get a only a few things,
 #   being able to determine which rigid body id is which
@@ -30,28 +31,32 @@ class NatNetClientClass(NatNetClient):
     def __del__(self):
         pass
 
-
-# This is a callback function that gets connected to the NatNet client. It is called once frame
-
+    # This is a callback function that gets connected to the NatNet client. It is called once frame
     def receiveNewFrame(self, frameNumber, markerSetCount, unlabeledMarkersCount, rigidBodyCount, skeletonCount,
                         labeledMarkerCount, timecode, timecodeSub, timestamp, isRecording, trackedModelsChanged):
-
+        # print( "Received frame", frameNumber )
+        # print( "Received rigidBodyCount", rigidBodyCount )    
         pass
-    # print( "Received frame", frameNumber )
-    # print( "Received rigidBodyCount", rigidBodyCount )
 
-
-# This is a callback function that gets connected to the NatNet client. It is called once per rigid body per frame
+    # This is a callback function that gets connected to the NatNet client. It is called once per rigid body per frame
     def receiveRigidBodyFrame(self,id, position, rotation):
         # rotation is in the format of quaternion
         # print( "Received frame for rigid body", id )
-        self.RigidBodyPosition = position
+        
+        if id == self.RigidBodyID['GV']:
+            self.RigidBodyPosition['GV'] = position
+            self.RigidBodyOrientation['GV'] = rotation
+        elif id == self.RigidBodyID['AR2']:
+            self.RigidBodyPosition['AR2'] = position
+            self.RigidBodyOrientation['AR2'] = rotation
+        else:
+            print("rigid body id does not match! throwing the frame data away...")
+            pass
+        
         # we should format the rotation to the euler and give the option for quaternion
     
 
     def initReceiveRigidBodyFrame(self, id, position, rotation):
-        # print( "Received frame for rigid body", id )
-        # self.RigidBodyPosition = position
         # this will will run twice, to get the id of both rigid bodies
 
         # store the data of the rigid bodies in temp variables
@@ -88,3 +93,33 @@ class NatNetClientClass(NatNetClient):
                 
             # set the listener to the regular rigidbodyframe listener
             self.streamingClient.rigidBodyListener = receiveRigidBodyFrame
+
+    def quat2eul(self,robot):
+        """
+        Convert a quaternion into euler angles (roll, pitch, yaw)
+        roll is rotation around x in radians (counterclockwise)
+        pitch is rotation around y in radians (counterclockwise)
+        yaw is rotation around z in radians (counterclockwise)
+        
+        - inputs is a string of either the gv or robotic arm
+
+        'GV' or 'AR2'
+        
+        - outputs the eular rotation
+
+        """
+        
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll_x = math.atan2(t0, t1)
+
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch_y = math.asin(t2)
+
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw_z = math.atan2(t3, t4)
+
+        return roll_x, pitch_y, yaw_z  # in radians
