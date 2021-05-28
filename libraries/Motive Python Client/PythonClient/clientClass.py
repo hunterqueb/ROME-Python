@@ -1,5 +1,6 @@
 from NatNetClient import NatNetClient
 import math
+import time
 
 # we need to get a only a few things,
 #   being able to determine which rigid body id is which
@@ -7,11 +8,11 @@ import math
 #   position and orientation of every rigid body
 #   ability to filter the data?
 
-class NatNetClientClass(NatNetClient):
+class NatNetClientClass():
     def __init__(self):
-        self.streamingClinet = super()
-        self.streamingClient.newFrameListener = receiveNewFrame
-        self.streamingClient.rigidBodyListener = initReceiveRigidBodyFrame
+        self.streamingClient = NatNetClient()
+        self.streamingClient.newFrameListener = self.receiveNewFrame
+        self.streamingClient.rigidBodyListener = self.initReceiveRigidBodyFrame
 
         #dictionary to get the id of whatever robot, set to none for now
         self.RigidBodyID = {'GV' : None, 'AR2' : None}
@@ -108,7 +109,10 @@ class NatNetClientClass(NatNetClient):
         - outputs the eular rotation
 
         """
-        
+
+        # here we need to take the self.RigidBodyOrientation['GV'] and convert it to the w x y and z variables
+        # w is scalar part,
+
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
         roll_x = math.atan2(t0, t1)
@@ -123,3 +127,11 @@ class NatNetClientClass(NatNetClient):
         yaw_z = math.atan2(t3, t4)
 
         return roll_x, pitch_y, yaw_z  # in radians
+
+
+if __name__ == "__main__":
+    client = NatNetClientClass()
+    
+    time.sleep(5)
+
+    del client
