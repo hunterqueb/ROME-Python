@@ -5,7 +5,7 @@ import time
 import random
 
 
-@jit(parallel=True, fastmath=True)
+# @jit(parallel=True, fastmath=True)
 def DH(theta, alpha, d, a):
     # DH1 = [np.math.cosd(theta) - np.math.sind(theta)*np.math.cosd(alpha) np.math.sind(theta)*np.math.sind(alpha) a*np.math.cosd(theta)
     #        np.math.sind(theta) np.math.cosd(theta)*np.math.cosd(alpha) - np.math.cosd(theta)*np.math.sind(alpha) a*np.math.sind(theta)
@@ -117,7 +117,6 @@ def AR2FKZYZ(theta0):
     return np.concatenate((pos, ori), axis=None)
 
 
-
 if __name__ == "__main__":
     theta0 = np.asarray([0, 0, 10, 0, 0, 0])
     state = AR2FKZYZ(theta0)
@@ -130,4 +129,17 @@ if __name__ == "__main__":
 
     end_time = time.time()
 
+    print("numba time")
+    print(end_time-start_time)
+
+    start_time = time.time()
+
+    for i in range(10):
+        theta0 = np.asarray([random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10),
+                             random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10)])
+        state = noAR2FKZYZ(theta0)
+
+    end_time = time.time()
+
+    print("no numba time")
     print(end_time-start_time)
