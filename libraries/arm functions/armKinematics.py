@@ -57,25 +57,6 @@ def AR2FKZYZ(theta0):
     theta5 = theta0[4]
     theta6 = theta0[5]
 
-    d1 = 169.77
-    a1 = 64.2
-    alpha1 = -90*PI/180
-    d2 = 0
-    a2 = 305
-    alpha2 = 0
-    d3 = 0
-    a3 = 0
-    alpha3 = 90*PI/180
-    d4 = -222.63
-    a4 = 0
-    alpha4 = -90*PI/180
-    d5 = 0
-    a5 = 0
-    alpha5 = 90*PI/180
-    d6 = -36.25
-    a6 = 0
-    alpha6 = 0
-
     DH1 = DH(theta1, alpha1, d1, a1)
     DH2 = DH(theta2, alpha2, d2, a2)
     DH3 = DH(theta3, alpha3, d3, a3)
